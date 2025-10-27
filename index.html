@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Algebra Quiz: Functions, Domain, and Range</title>
+
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- MathJax Configuration -->
     <script>
         MathJax = {
@@ -14,45 +15,40 @@
                 inlineMath: [['$', '$'], ['\\(', '\\)']],
                 displayMath: [['$$', '$$'], ['\\[', '\\]']]
             },
-            svg: {
-                fontCache: 'global'
-            }
+            svg: { fontCache: 'global' }
         };
     </script>
     <!-- MathJax CDN -->
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
     <style>
-        /* Using Inter font */
-        body {
-            font-family: "Inter", sans-serif;
-        }
-        /* Style for the rationale text */
+        body { font-family: "Inter", sans-serif; }
+
         .rationale {
-            display: none; /* Hidden by default */
-            font-size: 0.875rem; /* text-sm */
-            margin-top: 0.5rem; /* mt-2 */
-            padding: 0.5rem; /* p-2 */
-            border-radius: 0.375rem; /* rounded-md */
+            display: none;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
         }
         .rationale-correct {
             background-color: #f0fdf4; /* green-50 */
-            color: #14532d; /* green-900 */
+            color: #14532d;           /* green-900 */
         }
         .rationale-incorrect {
             background-color: #fef2f2; /* red-50 */
-            color: #7f1d1d; /* red-900 */
+            color: #7f1d1d;            /* red-900 */
         }
-        /* Custom styles for selected states */
         .option-btn.selected-correct {
             background-color: #dcfce7; /* green-100 */
-            border-color: #22c55e; /* green-500 */
-            color: #15803d; /* green-700 */
+            border-color: #22c55e;     /* green-500 */
+            color: #15803d;            /* green-700 */
             font-weight: 600;
         }
         .option-btn.selected-incorrect {
             background-color: #fee2e2; /* red-100 */
-            border-color: #ef4444; /* red-500 */
-            color: #b91c1c; /* red-700 */
+            border-color: #ef4444;     /* red-500 */
+            color: #b91c1c;            /* red-700 */
             font-weight: 600;
         }
         .option-btn:disabled {
@@ -62,27 +58,25 @@
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
-
     <div class="bg-white w-full max-w-2xl rounded-xl shadow-xl overflow-hidden">
-        
         <header class="p-6 bg-gray-50 border-b border-gray-200">
-            <h1 class="text-2xl font-bold text-center text-gray-800">Algebra: Functions, Domain, and Range</h1>
+            <h1 class="text-2xl font-bold text-center text-gray-800">
+                Algebra: Functions, Domain, and Range
+            </h1>
         </header>
 
         <!-- Quiz Container -->
         <div id="quiz-container" class="p-6 md:p-8">
-            <!-- Question Container -->
+            <!-- Question -->
             <div id="question-container" class="mb-6">
                 <p class="text-lg font-semibold text-gray-900" id="question-text">Loading question...</p>
                 <p class="text-sm text-gray-500 mt-2" id="question-hint">Loading hint...</p>
             </div>
 
-            <!-- Options Container -->
-            <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Options will be dynamically inserted here -->
-            </div>
+            <!-- Options -->
+            <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
 
-            <!-- Feedback & Navigation -->
+            <!-- Nav -->
             <div class="mt-8 text-right">
                 <button id="next-btn" class="hidden bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-200">
                     Next &rarr;
@@ -90,7 +84,7 @@
             </div>
         </div>
 
-        <!-- Result Container -->
+        <!-- Results -->
         <div id="result-container" class="hidden p-6 md:p-8 text-center">
             <h2 class="text-3xl font-bold text-gray-800 mb-4">Quiz Complete!</h2>
             <p class="text-xl text-gray-600 mb-8" id="score-text">Your score: 0 / 0</p>
@@ -98,319 +92,297 @@
                 Restart Quiz
             </button>
         </div>
-
     </div>
 
     <script>
-        // --- QUIZ DATA ---
-        // Manually parsed from the provided file content
+        // --- QUIZ DATA (corrected) ---
         const quizData = [
             // Category 1: Evaluating Functions
             {
                 question: "If $f(x) = 2x + 7$, what is the value of $f(-3)$?",
                 hint: "Replace the variable $x$ in the expression $2x + 7$ with the value $-3$ and simplify.",
                 options: [
-                    { text: "1", isCorrect: true, rationale: "This value is obtained by substituting $x = -3$ into the expression: $2(-3) + 7 = -6 + 7$." },
-                    { text: "13", isCorrect: false, rationale: "This result might come from an error in signs, such as calculating $2(3) + 7$ instead of $2(-3) + 7$." },
-                    { text: "-1", isCorrect: false, rationale: "This result might come from a sign error, such as $2(3) - 7$ or incorrectly adding $-6 + 7$." },
-                    { text: "10", isCorrect: false, rationale: "This result doesn't follow from substituting $-3$ into the given function expression." }
+                    { text: "1", isCorrect: true, rationale: "Substitute $x=-3$: $2(-3) + 7 = -6 + 7 = 1$." },
+                    { text: "13", isCorrect: false, rationale: "Likely used $2(3) + 7$ instead of $2(-3) + 7$." },
+                    { text: "-1", isCorrect: false, rationale: "Sign mix-up when adding $-6 + 7$." },
+                    { text: "10", isCorrect: false, rationale: "Doesn’t follow from substituting $-3$." }
                 ]
             },
             {
                 question: "If $g(t) = t^2 - 4t + 1$, what is the value of $g(5)$?",
-                hint: "Substitute $t=5$ into the function. Remember to follow the order of operations, calculating $5^2$ first.",
+                hint: "Substitute $t=5$ into the function. Calculate $5^2$ first.",
                 options: [
-                    { text: "6", isCorrect: true, rationale: "This value is found by calculating $(5)^2 - 4(5) + 1$, which simplifies to $25 - 20 + 1$." },
-                    { text: "4", isCorrect: false, rationale: "This result might be obtained if the last term $+1$ was forgotten in the calculation $25 - 20$." },
-                    { text: "46", isCorrect: false, rationale: "This result might come from an error in operation order, perhaps by adding $4(5) + 1$ before subtracting." },
-                    { text: "11", isCorrect: false, rationale: "This result could come from a sign error, such as $25 - 20 - 1$ instead of $25 - 20 + 1$." }
+                    { text: "6", isCorrect: true, rationale: "$(5)^2 - 4(5) + 1 = 25 - 20 + 1 = 6$." },
+                    { text: "4", isCorrect: false, rationale: "Forgot the $+1$." },
+                    { text: "46", isCorrect: false, rationale: "Order-of-operations error." },
+                    { text: "11", isCorrect: false, rationale: "Did $25 - 20 - 1$." }
                 ]
             },
             {
                 question: "If $f(x) = x - 5$, what is the value of $3f(7)$?",
-                hint: "First, find the value of $f(7)$ by substituting $x=7$. Then, multiply your answer by 3.",
+                hint: "Find $f(7)$ first, then multiply by 3.",
                 options: [
-                    { text: "16", isCorrect: false, rationale: "This might be the result of incorrectly calculating $3(7) - 5$ instead of first finding $f(7)$." },
-                    { text: "2", isCorrect: false, rationale: "This is the value of $f(7)$ itself, which is $7 - 5$. The question asks for $3$ times this value." },
-                    { text: "6", isCorrect: true, rationale: "This is found by first evaluating $f(7) = 7 - 5 = 2$, and then multiplying that result by 3." },
-                    { text: "-6", isCorrect: false, rationale: "This result might come from a sign error in the final multiplication or initial subtraction." }
+                    { text: "16", isCorrect: false, rationale: "Computed $3\\cdot 7 - 5$ instead of $3\\cdot f(7)$." },
+                    { text: "2", isCorrect: false, rationale: "$f(7)=2$, but the question asks for $3f(7)$." },
+                    { text: "6", isCorrect: true, rationale: "$f(7)=7-5=2$, then $3\\cdot 2=6$." },
+                    { text: "-6", isCorrect: false, rationale: "Sign error in multiplication or subtraction." }
                 ]
             },
             {
                 question: "If $p(x) = -2x^2 + 1$, what is the value of $p(-1) + 5$?",
-                hint: "Calculate $p(-1)$ first. Be careful with the exponent: $(-1)^2 = 1$. Then add 5 to your result.",
+                hint: "Compute $p(-1)$ carefully: $(-1)^2=1$. Then add 5.",
                 options: [
-                    { text: "3", isCorrect: false, rationale: "This result might come from miscalculating $(-1)^2$ as $-1$, leading to $-2(-1) + 1 = 3$, before adding 5." },
-                    { text: "4", isCorrect: true, rationale: "This is found by first evaluating $p(-1) = -2(-1)^2 + 1 = -2(1) + 1 = -1$. Then, add 5 to this result: $-1 + 5$." },
-                    { text: "8", isCorrect: false, rationale: "This result might come from an error in signs, perhaps calculating $p(-1)$ as $3$ and then adding $5$." },
-                    { text: "-1", isCorrect: false, rationale: "This is the value of $p(-1)$ alone. The question asks for this value plus 5." }
+                    { text: "3", isCorrect: false, rationale: "Used $-2(-1) + 1$ as if $(-1)^2=-1$." },
+                    { text: "4", isCorrect: true, rationale: "$p(-1)=-2(1)+1=-1$, then $-1+5=4$." },
+                    { text: "8", isCorrect: false, rationale: "Sign error when evaluating $p(-1)$." },
+                    { text: "-1", isCorrect: false, rationale: "That’s $p(-1)$ only; the problem asks for $p(-1)+5$." }
                 ]
             },
             {
                 question: "If $h(x) = 10$, what is the value of $h(2) + h(-2)$?",
-                hint: "This is a constant function. What is the output for *any* input value $x$?",
+                hint: "This is a constant function; the output is the same for any $x$.",
                 options: [
-                    { text: "0", isCorrect: false, rationale: "This might be assumed if $h(2)$ and $h(-2)$ were opposites, but the function's output is constant." },
-                    { text: "10", isCorrect: false, rationale: "This is the value of $h(x)$ for any single input, but the question asks for the sum of two function evaluations." },
-                    { text: "20", isCorrect: true, rationale: "Since $h(x)$ is a constant function, $h(2) = 10$ and $h(-2) = 10$. The sum is $10 + 10$." },
-                    { text: "14", isCorrect: false, rationale: "This result doesn't follow from the function definition, which always outputs 10 regardless of the input." }
+                    { text: "0", isCorrect: false, rationale: "Opposites don’t apply to constant functions." },
+                    { text: "10", isCorrect: false, rationale: "That’s a single evaluation; you need the sum of two." },
+                    { text: "20", isCorrect: true, rationale: "$h(2)=10$ and $h(-2)=10$, so $10+10=20$." },
+                    { text: "14", isCorrect: false, rationale: "Doesn’t follow from a constant output of 10." }
                 ]
             },
-             {
+            {
                 question: "If $k(x) = |x - 8| + 3$, what is the value of $k(2)$?",
-                hint: "First, calculate the value inside the absolute value bars: $2 - 8$. Then take the absolute value of that result and add 3.",
+                hint: "Compute $|2-8|$ first, then add 3.",
                 options: [
-                    { text: "9", isCorrect: true, rationale: "This is found by calculating $|2 - 8| + 3 = |-6| + 3 = 6 + 3$." },
-                    { text: "-3", isCorrect: false, rationale: "This result might come from ignoring the absolute value, calculating $-6 + 3$." },
-                    { text: "13", isCorrect: false, rationale: "This result might come from incorrectly calculating $|2 - 8|$ as $10$." },
-                    { text: "6", isCorrect: false, rationale: "This is the value of $|2 - 8|$, but the function adds 3 to this result." }
+                    { text: "9", isCorrect: true, rationale: "$|2-8|+3=|-6|+3=6+3=9$." },
+                    { text: "-3", isCorrect: false, rationale: "Ignored absolute value: $-6+3$." },
+                    { text: "13", isCorrect: false, rationale: "Miscomputed $|2-8|$ as 10." },
+                    { text: "6", isCorrect: false, rationale: "That’s $|2-8|$; don’t forget the $+3$." }
                 ]
             },
             {
                 question: "If $f(x) = \\frac{x+3}{x-1}$, what is the value of $f(5)$?",
-                hint: "Substitute $x=5$ into both the numerator and the denominator, then simplify the fraction.",
+                hint: "Substitute into numerator and denominator, then simplify.",
                 options: [
-                    { text: "2", isCorrect: true, rationale: "This is found by calculating $\\frac{5+3}{5-1} = \\frac{8}{4}$." },
-                    { text: "8", isCorrect: false, rationale: "This is the value of the numerator, $5+3$, but you must also divide by the denominator." },
-                    { text: "4", isCorrect: false, rationale: "This is the value of the denominator, $5-1$, not the final value of the fraction." },
-                    { text: "1.5", isCorrect: false, rationale: "This might result from an arithmetic error, such as $\\frac{6}{4}$." }
+                    { text: "2", isCorrect: true, rationale: "$\\tfrac{5+3}{5-1}=\\tfrac{8}{4}=2$." },
+                    { text: "8", isCorrect: false, rationale: "That’s the numerator only." },
+                    { text: "4", isCorrect: false, rationale: "That’s the denominator only." },
+                    { text: "1.5", isCorrect: false, rationale: "Arithmetic slip (e.g., $\\tfrac{6}{4}$)." }
                 ]
             },
             {
                 question: "If $g(x) = 2x^3 - x$, what is the value of $g(-2)$?",
-                hint: "Be careful with signs. $(-2)^3 = -8$. Substitute $x=-2$ into the expression.",
+                hint: "Careful with signs: $(-2)^3=-8$.",
                 options: [
-                    { text: "-14", isCorrect: true, rationale: "This is found by calculating $2(-2)^3 - (-2) = 2(-8) + 2 = -16 + 2$." },
-                    { text: "-18", isCorrect: false, rationale: "This result might come from a sign error, such as $2(-8) - 2 = -16 - 2$." },
-                    { text: "14", isCorrect: false, rationale: "This result might come from miscalculating $(-2)^3$ as $8$, leading to $2(8) - (-2) = 16 + 2 = 18$, or $2(-8) - 2$ and a sign flip." },
-                    { text: "18", isCorrect: false, rationale: "This result might come from miscalculating $(-2)^3$ as $8$, leading to $2(8) - (-2) = 16 + 2$." }
+                    { text: "-14", isCorrect: true, rationale: "$2(-8) - (-2) = -16 + 2 = -14$." },
+                    { text: "-18", isCorrect: false, rationale: "Did $2(-8) - 2$ instead of $-(-2)$." },
+                    { text: "14", isCorrect: false, rationale: "Likely used $(-2)^3=8$ or flipped a sign." },
+                    { text: "18", isCorrect: false, rationale: "Used $(-2)^3=8$ and added signs incorrectly." }
                 ]
             },
             {
                 question: "If $f(x) = 2x$ and $g(x) = x + 1$, what is the value of $f(g(3))$?",
-                hint: "This is a composite function. First, find the value of $g(3)$, then use that result as the input for $f(x)$_.",
+                hint: "Composite function: find $g(3)$, then plug into $f$.",
                 options: [
-                    { text: "8", isCorrect: true, rationale: "First, $g(3) = 3 + 1 = 4$. Then, $f(4) = 2(4) = 8$." },
-                    { text: "7", isCorrect: false, rationale: "This might be $f(3) + 1$, which is $2(3) + 1 = 7$. This is not the correct order." },
-                    { text: "6", isCorrect: false, rationale: "This is the value of $f(3)$ alone. You need to evaluate $g(3)$ first." },
-                    { text: "4", isCorrect: false, rationale: "This is the value of $g(3)$ alone. You need to plug this value into $f(x)$." }
+                    { text: "8", isCorrect: true, rationale: "$g(3)=4$, so $f(4)=8$." },
+                    { text: "7", isCorrect: false, rationale: "Computed $f(3)+1$." },
+                    { text: "6", isCorrect: false, rationale: "That’s $f(3)$; you need $f(g(3))$." },
+                    { text: "4", isCorrect: false, rationale: "That’s $g(3)$; still need $f(\\cdot)$." }
                 ]
             },
             {
                 question: "If $f(x) = x^2 + 1$, what is the value of $f(f(0))$?",
-                hint: "Work from the inside out. First, find $f(0)$, then plug that result back into $f(x)$_.",
+                hint: "Work inside-out: find $f(0)$, then apply $f$ again.",
                 options: [
-                    { text: "2", isCorrect: true, rationale: "First, $f(0) = (0)^2 + 1 = 1$. Then, $f(1) = (1)^2 + 1 = 2$." },
-                    { text: "1", isCorrect: false, rationale: "This is the value of $f(0)$, but you need to apply the function a second time." },
-                    { text: "5", isCorrect: false, rationale: "This might be $f(2)$, but the input for the second step is $f(0)$." },
-                    { text: "0", isCorrect: false, rationale: "This is the initial input, not the final output after applying the function twice." }
+                    { text: "2", isCorrect: true, rationale: "$f(0)=1$, then $f(1)=2$." },
+                    { text: "1", isCorrect: false, rationale: "That’s $f(0)$; apply $f$ again." },
+                    { text: "5", isCorrect: false, rationale: "That’s $f(2)$, not $f(f(0))$." },
+                    { text: "0", isCorrect: false, rationale: "Initial input, not the final output." }
                 ]
             },
+
             // Category 2: Domain & Range
             {
                 question: "Consider the relation $\\{ (4, 7), (8, 9), (4, 3) \\}$. What is the domain?",
-                hint: "The domain is the set of all the first numbers (x-coordinates) in the ordered pairs. Remember, a set only lists unique values.",
+                hint: "Domain = set of all first coordinates (unique).",
                 options: [
-                    { text: "$\\{7, 9, 3\\}$", isCorrect: false, rationale: "This is the set of all the second coordinates (y-values), which is the range of the relation." },
-                    { text: "$\\{4, 8\\}$", isCorrect: true, rationale: "The domain is the set of all unique first coordinates (x-values). The x-values are 4, 8, and 4." },
-                    { text: "$\\{4, 8, 4\\}$", isCorrect: false, rationale: "This lists all the first coordinates, but sets only include each unique element once." },
-                    { text: "$\\{4, 7, 8, 9, 3\\}$", isCorrect: false, rationale: "This set includes both the x-values and y-values. The domain only includes the x-values." }
+                    { text: "$\\{7, 9, 3\\}$", isCorrect: false, rationale: "Those are second coordinates (the range)." },
+                    { text: "$\\{4, 8\\}$", isCorrect: true, rationale: "First coordinates are 4, 8, 4; unique set is $\\{4,8\\}$." },
+                    { text: "$\\{4, 8, 4\\}$", isCorrect: false, rationale: "Sets list each element once." },
+                    { text: "$\\{4, 7, 8, 9, 3\\}$", isCorrect: false, rationale: "Mixed x- and y-values." }
                 ]
             },
             {
                 question: "Consider the relation $\\{ (1, 5), (2, 5), (3, 5) \\}$. What is the range?",
-                hint: "The range is the set of all the second numbers (y-coordinates) in the ordered pairs. How many unique y-values are there?",
+                hint: "Range = set of all second coordinates (unique).",
                 options: [
-                    { text: "$\\{1, 2, 3\\}$", isCorrect: false, rationale: "This is the set of all the first coordinates (x-values), which is the domain of the relation." },
-                    { text: "$\\{1, 2, 3, 5\\}$", isCorrect: false, rationale: "This set includes both the x-values and y-values. The range only includes the y-values." },
-                    { text: "$\\{5, 5, 5\\}$", isCorrect: false, rationale: "This lists all the second coordinates, but sets only include each unique element once." },
-                    { text: "$\\{5\\}$", isCorrect: true, rationale: "The range is the set of all unique second coordinates (y-values). The only y-value that appears is 5." }
+                    { text: "$\\{1, 2, 3\\}$", isCorrect: false, rationale: "Those are first coordinates (the domain)." },
+                    { text: "$\\{1, 2, 3, 5\\}$", isCorrect: false, rationale: "Mixed x- and y-values." },
+                    { text: "$\\{5, 5, 5\\}$", isCorrect: false, rationale: "Sets don’t repeat identical elements." },
+                    { text: "$\\{5\\}$", isCorrect: true, rationale: "Only y-value present is 5." }
                 ]
             },
             {
                 question: "Consider the relation $\\{ (1, 2), (3, 4), (5, 6) \\}$. What is the domain?",
-                hint: "The domain is the set of all the first numbers (x-coordinates) in the ordered pairs.",
+                hint: "Domain = first coordinates (unique).",
                 options: [
-                    { text: "$\\{1, 3, 5\\}$", isCorrect: true, rationale: "The domain is the set of all unique first coordinates (x-values)." },
-                    { text: "$\\{2, 4, 6\\}$", isCorrect: false, rationale: "This is the set of all the second coordinates (y-values), which is the range." },
-                    { text: "$\\{1, 2, 3, 4, 5, 6\\}$", isCorrect: false, rationale: "This set includes both the x-values and y-values." },
-                    { text: "$\\{1, 2\\}$", isCorrect: false, rationale: "This is only the first ordered pair, not the complete set of x-values." }
+                    { text: "$\\{1, 3, 5\\}$", isCorrect: true, rationale: "First coordinates are 1, 3, 5." },
+                    { text: "$\\{2, 4, 6\\}$", isCorrect: false, rationale: "Those are second coordinates (the range)." },
+                    { text: "$\\{1, 2, 3, 4, 5, 6\\}$", isCorrect: false, rationale: "Mixed x- and y-values." },
+                    { text: "$\\{1, 2\\}$", isCorrect: false, rationale: "Only comes from the first pair." }
                 ]
             },
             {
                 question: "Consider the relation $\\{ (1, 2), (3, 4), (5, 6) \\}$. What is the range?",
-                hint: "The range is the set of all the second numbers (y-coordinates) in the ordered pairs.",
+                hint: "Range = second coordinates (unique).",
                 options: [
-                    { text: "$\\{1, 3, 5\\}$", isCorrect: false, rationale: "This is the set of all the first coordinates (x-values), which is the domain." },
-                    { text: "$\\{2, 4, 6\\}$", isCorrect: true, rationale: "The range is the set of all unique second coordinates (y-values)." },
-                    { text: "$\\{1, 2, 3, 4, 5, 6\\}$", isCorrect: false, rationale: "This set includes both the x-values and y-values." },
-                    { text: "$\\{5, 6\\}$", isCorrect: false, rationale: "This is only the last ordered pair, not the complete set of y-values." }
+                    { text: "$\\{1, 3, 5\\}$", isCorrect: false, rationale: "Those are first coordinates (the domain)." },
+                    { text: "$\\{2, 4, 6\\}$", isCorrect: true, rationale: "Second coordinates are 2, 4, 6." },
+                    { text: "$\\{1, 2, 3, 4, 5, 6\\}$", isCorrect: false, rationale: "Mixed x- and y-values." },
+                    { text: "$\\{5, 6\\}$", isCorrect: false, rationale: "Incomplete set of y-values." }
                 ]
             },
             {
-                question: "Consider the relation $\\{ (\\text{'a'}, 1), (\\text{'b'}, 2), (\\text{'c'}, 3) \\}$. What is the domain?",
-                hint: "The domain is the set of all the first elements in the ordered pairs. In this case, they are letters.",
+                question: "Consider the relation $\\{ (\\text{a}, 1), (\\text{b}, 2), (\\text{c}, 3) \\}$. What is the domain?",
+                hint: "Domain = first elements of the pairs (here, letters).",
                 options: [
-                    { text: "$\\{\\text{'a'}, \\text{'b'}, \\text{'c'}\\}$", isCorrect: true, rationale: "The domain is the set of all unique first elements (inputs)." },
-                    { text: "$\\{1, 2, 3\\}$", isCorrect: false, rationale: "This is the set of all the second elements (outputs), which is the range." },
-                    { text: "$\\{\\text{'a'}, 1, \\text{'b'}, 2, \\text{'c'}, 3\\}$", isCorrect: false, rationale: "This set includes all elements, not just the inputs." },
-                    { text: "$\\{3\\}$", isCorrect: false, rationale: "This is only a single output value, not the domain." }
+                    { text: "$\\{\\text{a}, \\text{b}, \\text{c}\\}$", isCorrect: true, rationale: "All unique inputs." },
+                    { text: "$\\{1, 2, 3\\}$", isCorrect: false, rationale: "Those are outputs (the range)." },
+                    { text: "$\\{\\text{a}, 1, \\text{b}, 2, \\text{c}, 3\\}$", isCorrect: false, rationale: "Mixed inputs and outputs." },
+                    { text: "$\\{3\\}$", isCorrect: false, rationale: "Single output, not the domain." }
                 ]
             },
             {
-                question: "Consider the relation $\\{ (\\text{'a'}, 1), (\\text{'b'}, 2), (\\text{'c'}, 1) \\}$. What is the range?",
-                hint: "The range is the set of all the second elements (outputs). Remember that sets only list unique values.",
+                question: "Consider the relation $\\{ (\\text{a}, 1), (\\text{b}, 2), (\\text{c}, 1) \\}$. What is the range?",
+                hint: "Range = set of second elements (unique).",
                 options: [
-                    { text: "$\\{\\text{'a'}, \\text{'b'}, \\text{'c'}\\}$", isCorrect: false, rationale: "This is the set of all the first elements (inputs), which is the domain." },
-                    { text: "$\\{1, 2\\}$", isCorrect: true, rationale: "The range is the set of all unique second elements. The outputs are 1, 2, and 1." },
-                    { text: "$\\{1, 2, 1\\}$", isCorrect: false, rationale: "This lists all the outputs, but sets only include each unique element once." },
-                    { text: "$\\{1\\}$", isCorrect: false, rationale: "This is one of the outputs, but it is not the complete set of unique outputs." }
+                    { text: "$\\{\\text{a}, \\text{b}, \\text{c}\\}$", isCorrect: false, rationale: "Those are inputs (domain)." },
+                    { text: "$\\{1, 2\\}$", isCorrect: true, rationale: "Outputs are 1, 2, 1; unique set is $\\{1,2\\}$." },
+                    { text: "$\\{1, 2, 1\\}$", isCorrect: false, rationale: "Sets don’t repeat identical elements." },
+                    { text: "$\\{1\\}$", isCorrect: false, rationale: "Incomplete; 2 is also present." }
                 ]
             },
             {
                 question: "Consider the relation $\\{ (5, 0), (0, 5), (-5, 0) \\}$. What is the domain?",
-                hint: "The domain is the set of all unique x-coordinates (first numbers) from the pairs.",
+                hint: "Domain = first coordinates (unique).",
                 options: [
-                    { text: "$\\{5, 0, -5\\}$", isCorrect: true, rationale: "The domain is the set of all unique first coordinates: 5, 0, and -5." },
-                    { text: "$\\{0, 5\\}$", isCorrect: false, rationale: "This is the set of all unique second coordinates (y-values), which is the range." },
-                    { text: "$\\{5, 0\\}$", isCorrect: false, rationale: "This is missing the x-value -5." },
-                    { text: "$\\{5, 0, 0, 5, -5, 0\\}$", isCorrect: false, rationale: "This lists all numbers, not just the unique x-values." }
+                    { text: "$\\{5, 0, -5\\}$", isCorrect: true, rationale: "Unique first coordinates." },
+                    { text: "$\\{0, 5\\}$", isCorrect: false, rationale: "Those are y-values (range)." },
+                    { text: "$\\{5, 0\\}$", isCorrect: false, rationale: "Missing $-5$." },
+                    { text: "$\\{5, 0, 0, 5, -5, 0\\}$", isCorrect: false, rationale: "Sets don’t repeat identical elements." }
                 ]
             },
             {
                 question: "Consider the relation $\\{ (5, 0), (0, 5), (-5, 0) \\}$. What is the range?",
-                hint: "The range is the set of all unique y-coordinates (second numbers) from the pairs.",
+                hint: "Range = second coordinates (unique).",
                 options: [
-                    { text: "$\\{5, 0, -5\\}$", isCorrect: false, rationale: "This is the set of all unique first coordinates (x-values), which is the domain." },
-                    { text: "$\\{0, 5\\}$", isCorrect: true, rationale: "The range is the set of all unique second coordinates. The y-values are 0, 5, and 0." },
-                    { text: "$\\{0, 5, 0\\}$", isCorrect: false, rationale: "This lists all the second coordinates, but sets only include each unique element once." },
-                    { text: "$\\{5\\}$", isCorrect: false, rationale: "This is one of the outputs, but it is not the complete set of unique outputs." }
+                    { text: "$\\{5, 0, -5\\}$", isCorrect: false, rationale: "Those are x-values (domain)." },
+                    { text: "$\\{0, 5\\}$", isCorrect: true, rationale: "Unique second coordinates are 0 and 5." },
+                    { text: "$\\{0, 5, 0\\}$", isCorrect: false, rationale: "Sets don’t repeat identical elements." },
+                    { text: "$\\{5\\}$", isCorrect: false, rationale: "Incomplete; 0 is also present." }
                 ]
             },
             {
                 question: "Consider the relation $\\{ (1, 1), (2, 2), (3, 3) \\}$. What is the domain?",
-                hint: "The domain is the set of all the first numbers (x-coordinates) in the ordered pairs.",
+                hint: "Domain = set of all first coordinates (unique).",
                 options: [
-                    { text: "$\\{1, 2, 3\\}$", isCorrect: true, rationale: "The domain is the set of all unique first coordinates." },
-                    { text: "$\\{1, 2, 3, 1, 2, 3\\}$", isCorrect: false, rationale: "This lists all numbers, not just the unique x-values." },
-                    { text: "$\\{1, 2, 3\\}$", isCorrect: true, rationale: "The set of x-values is $\\{1, 2, 3\\}$. This is the domain." }, // Note: This is a duplicate, but the options will be shuffled. Let's make it more distinct.
-                    // Let's fix the above question's options to be better.
-                    // Correcting options for Q19
-                    { text: "$\\{1, 2, 3\\}$", isCorrect: true, rationale: "The domain is the set of all unique first coordinates (x-values)." },
-                    { text: "$\\{1, 1, 2, 2, 3, 3\\}$", isCorrect: false, rationale: "This set includes both the x-values and y-values." },
-                    { text: "$\\{1\\}$", isCorrect: false, rationale: "This is only one of the x-values, not the complete set." },
-                    { text: "$\\{ (1, 1), (2, 2), (3, 3) \\}$", isCorrect: false, rationale: "This is the relation itself, not the set of x-values." }
-                ]
-            },
-            // Re-creating Q19 with fixed options
-            {
-                question: "Consider the relation $\\{ (1, 1), (2, 2), (3, 3) \\}$. What is the domain?",
-                hint: "The domain is the set of all the first numbers (x-coordinates) in the ordered pairs.",
-                options: [
-                    { text: "$\\{1, 2, 3\\}$", isCorrect: true, rationale: "The domain is the set of all unique first coordinates (x-values)." },
-                    { text: "$\\{1, 1, 2, 2, 3, 3\\}$", isCorrect: false, rationale: "This set includes both the x-values and y-values." },
-                    { text: "$\\{1\\}$", isCorrect: false, rationale: "This is only one of the x-values, not the complete set." },
-                    { text: "$\\{ (1, 1), (2, 2), (3, 3) \\}$", isCorrect: false, rationale: "This is the relation itself, not just the set of x-values." }
+                    { text: "$\\{1, 2, 3\\}$", isCorrect: true, rationale: "First coordinates are 1, 2, 3." },
+                    { text: "$\\{1, 1, 2, 2, 3, 3\\}$", isCorrect: false, rationale: "Sets list unique elements only." },
+                    { text: "$\\{1\\}$", isCorrect: false, rationale: "Incomplete; missing 2 and 3." },
+                    { text: "$\\{ (1,1), (2,2), (3,3) \\}$", isCorrect: false, rationale: "That’s the relation, not the domain." }
                 ]
             },
             {
                 question: "Consider the relation $\\{ (1, 1), (2, 2), (3, 3) \\}$. What is the range?",
-                hint: "The range is the set of all the second numbers (y-coordinates) in the ordered pairs.",
+                hint: "Range = set of all second coordinates (unique).",
                 options: [
-                    { text: "$\\{1, 2, 3\\}$", isCorrect: true, rationale: "The range is the set of all unique second coordinates (y-values)." },
-                    { text: "$\\{1, 1, 2, 2, 3, 3\\}$", isCorrect: false, rationale: "This set includes both the x-values and y-values." },
-                    { text: "$\\{1, 2\\}$", isCorrect: false, rationale: "This is an incomplete set of the y-values." },
-                    { text: "$\\{ (1, 1), (2, 2), (3, 3) \\}$", isCorrect: false, rationale: "This is the relation itself, not just the set of y-values." }
+                    { text: "$\\{1, 2, 3\\}$", isCorrect: true, rationale: "Second coordinates are 1, 2, 3." },
+                    { text: "$\\{1, 1, 2, 2, 3, 3\\}$", isCorrect: false, rationale: "Sets list unique elements only." },
+                    { text: "$\\{1, 2\\}$", isCorrect: false, rationale: "Incomplete; missing 3." },
+                    { text: "$\\{ (1,1), (2,2), (3,3) \\}$", isCorrect: false, rationale: "That’s the relation, not the range." }
                 ]
             },
+
             // Category 3: Identifying Functions
             {
                 question: "Is the relation $\\{ (1, 2), (3, 4), (5, 6), (7, 8) \\}$ a function?",
-                hint: "To be a function, every x-value (input) must have exactly one y-value (output). Check if any x-values are repeated.",
+                hint: "Every input (x) must have exactly one output (y).",
                 options: [
-                    { text: "Yes", isCorrect: true, rationale: "Each x-value (1, 3, 5, 7) is paired with exactly one y-value. No x-values are repeated." },
-                    { text: "No", isCorrect: false, rationale: "This relation is a function because every input has only one output. Repeating y-values would be allowed, but repeating x-values is not." }
+                    { text: "Yes", isCorrect: true, rationale: "Each x-value is unique and has one y-value." },
+                    { text: "No", isCorrect: false, rationale: "No x-values repeat with different outputs." }
                 ]
             },
             {
-                question: "Is the relation $\\{ (10, \\text{'a'}), (20, \\text{'b'}), (30, \\text{'a'}), (40, \\text{'c'}) \\}$ a function?",
-                hint: "Does any x-value (input) map to more than one y-value (output)? It's okay for different inputs to have the same output.",
+                question: "Is the relation $\\{ (10, \\text{a}), (20, \\text{b}), (30, \\text{a}), (40, \\text{c}) \\}$ a function?",
+                hint: "It’s okay if outputs repeat; x-values must not split to multiple y-values.",
                 options: [
-                    { text: "Yes", isCorrect: true, rationale: "Each x-value (10, 20, 30, 40) is unique and paired with exactly one y-value. It is okay for y-values (like 'a') to be repeated." },
-                    { text: "No", isCorrect: false, rationale: "This relation is a function. The y-value 'a' is repeated, but this is allowed. The condition for a function is that no x-value is repeated." }
+                    { text: "Yes", isCorrect: true, rationale: "All x-values (10,20,30,40) are unique." },
+                    { text: "No", isCorrect: false, rationale: "Repeating outputs are allowed; inputs are unique." }
                 ]
             },
             {
-                question: "Is the relation $\\{ (-1, \\text{'a'}), (0, \\text{'b'}), (-1, \\text{'c'}) \\}$ a function?",
-                hint: "Look closely at the x-values. Is any x-value repeated and paired with a *different* y-value?",
+                question: "Is the relation $\\{ (-1, \\text{a}), (0, \\text{b}), (-1, \\text{c}) \\}$ a function?",
+                hint: "Check if any x-value maps to more than one y-value.",
                 options: [
-                    { text: "Yes", isCorrect: false, rationale: "This relation is not a function because the input $x = -1$ is paired with two different outputs, 'a' and 'c'." },
-                    { text: "No", isCorrect: true, rationale: "The x-value $-1$ is paired with 'a' and also with 'c'. Since one input has two different outputs, it is not a function." }
+                    { text: "Yes", isCorrect: false, rationale: "$x=-1$ maps to both $\\text{a}$ and $\\text{c}$." },
+                    { text: "No", isCorrect: true, rationale: "One input has two outputs, so it’s not a function." }
                 ]
             },
-             {
+            {
                 question: "Is the relation $\\{ (1, 5), (2, 5), (3, 5) \\}$ a function?",
-                hint: "Check the x-values. Are any of them repeated?",
+                hint: "Are any x-values repeated?",
                 options: [
-                    { text: "Yes", isCorrect: true, rationale: "Each x-value (1, 2, 3) is unique and has exactly one output. It's allowed for multiple inputs to have the same output (5)." },
-                    { text: "No", isCorrect: false, rationale: "This relation is a function. The y-value 5 is repeated, but this is allowed. The x-values are all different." }
+                    { text: "Yes", isCorrect: true, rationale: "Each input is unique with exactly one output." },
+                    { text: "No", isCorrect: false, rationale: "Same output for different inputs is allowed." }
                 ]
             },
             {
                 question: "Is the relation $\\{ (5, 1), (5, 2), (5, 3) \\}$ a function?",
-                hint: "Check the x-values. Is the same x-value paired with different y-values?",
+                hint: "Does one x-value map to multiple y-values?",
                 options: [
-                    { text: "Yes", isCorrect: false, rationale: "This relation is not a function. The input $x = 5$ is paired with three different outputs (1, 2, and 3)." },
-                    { text: "No", isCorrect: true, rationale: "The x-value 5 is paired with 1, 2, and 3. Since one input has multiple outputs, it is not a function." }
+                    { text: "Yes", isCorrect: false, rationale: "$x=5$ maps to 1, 2, and 3." },
+                    { text: "No", isCorrect: true, rationale: "One input to multiple outputs is not a function." }
                 ]
             },
             {
-                question: "Is the relation $\\{ (\\text{'a'}, 1), (\\text{'b'}, 1), (\\text{'c'}, 1) \\}$ a function?",
-                hint: "Are any of the inputs ('a', 'b', 'c') repeated?",
+                question: "Is the relation $\\{ (\\text{a}, 1), (\\text{b}, 1), (\\text{c}, 1) \\}$ a function?",
+                hint: "Are any of the inputs repeated?",
                 options: [
-                    { text: "Yes", isCorrect: true, rationale: "Each input ('a', 'b', 'c') is unique and has exactly one output. It is fine for all outputs to be the same." },
-                    { text: "No", isCorrect: false, rationale: "This relation is a function. The output 1 is repeated, but this is allowed. Each input is unique." }
+                    { text: "Yes", isCorrect: true, rationale: "All inputs are unique and each maps to one output." },
+                    { text: "No", isCorrect: false, rationale: "Repeating outputs is allowed; inputs are unique." }
                 ]
             },
             {
-                question: "Is the relation $\\{ (1, \\text{'a'}), (1, \\text{'b'}), (2, \\text{'c'}) \\}$ a function?",
-                hint: "Look at the input $x = 1$. How many outputs is it paired with?",
+                question: "Is the relation $\\{ (1, \\text{a}), (1, \\text{b}), (2, \\text{c}) \\}$ a function?",
+                hint: "Focus on $x=1$; how many outputs?",
                 options: [
-                    { text: "Yes", isCorrect: false, rationale: "This relation is not a function. The input 1 is paired with two different outputs, 'a' and 'b'." },
-                    { text: "No", isCorrect: true, rationale: "The x-value 1 is paired with 'a' and also with 'b'. Since one input has two different outputs, it is not a function." }
+                    { text: "Yes", isCorrect: false, rationale: "$x=1$ has two outputs ($\\text{a}$ and $\\text{b}$)." },
+                    { text: "No", isCorrect: true, rationale: "One input to multiple outputs is not a function." }
                 ]
             },
             {
                 question: "Is the relation $\\{ (9, 3), (9, -3), (4, 2) \\}$ a function?",
-                hint: "Check the x-value 9. Does it map to more than one y-value?",
+                hint: "Focus on $x=9$.",
                 options: [
-                    { text: "Yes", isCorrect: false, rationale: "This relation is not a function. The input 9 is paired with two different outputs, 3 and -3." },
-                    { text: "No", isCorrect: true, rationale: "The x-value 9 is paired with both 3 and -3. Since one input has multiple outputs, it is not a function." }
+                    { text: "Yes", isCorrect: false, rationale: "$x=9$ has outputs 3 and -3." },
+                    { text: "No", isCorrect: true, rationale: "One input to multiple outputs is not a function." }
                 ]
             },
             {
-                question: "Is the relation $\\{ (1, \\text{'z'}), (2, \\text{'y'}), (3, \\text{'x'}) \\}$ a function?",
-                hint: "Are any of the x-values (1, 2, 3) repeated?",
+                question: "Is the relation $\\{ (1, \\text{z}), (2, \\text{y}), (3, \\text{x}) \\}$ a function?",
+                hint: "Are any x-values repeated?",
                 options: [
-                    { text: "Yes", isCorrect: true, rationale: "Each x-value (1, 2, 3) is unique and is paired with exactly one y-value. This is a function." },
-                    { text: "No", isCorrect: false, rationale: "This relation is a function. All inputs are unique and have one output." }
+                    { text: "Yes", isCorrect: true, rationale: "Each input (1,2,3) has exactly one output." },
+                    { text: "No", isCorrect: false, rationale: "All inputs are unique with one output each." }
                 ]
             },
             {
-                question: "Is the relation $\\{ (\\text{'apple'}, 1), (\\text{'banana'}, 2), (\\text{'apple'}, 3) \\}$ a function?",
-                hint: "Look at the input 'apple'. How many different outputs does it have?",
+                question: "Is the relation $\\{ (\\text{apple}, 1), (\\text{banana}, 2), (\\text{apple}, 3) \\}$ a function?",
+                hint: "Does one input map to more than one output?",
                 options: [
-                    { text: "Yes", isCorrect: false, rationale: "This relation is not a function. The input 'apple' is paired with two different outputs, 1 and 3." },
-                    { text: "No", isCorrect: true, rationale: "The input 'apple' is paired with both 1 and 3. Since one input has multiple outputs, it is not a function." }
+                    { text: "Yes", isCorrect: false, rationale: "$\\text{apple}$ maps to 1 and 3." },
+                    { text: "No", isCorrect: true, rationale: "One input to multiple outputs is not a function." }
                 ]
             }
         ];
-        
-        // --- Clean up potential duplicates from copy-paste ---
-        // This is a bit manual, but I see a duplicate of Q19. Let's remove it.
-        // The array above has 31 items. Q18 and Q19 are identical.
-        quizData.splice(18, 1); // Removes the duplicate at index 18
-        
 
         // --- DOM Elements ---
         const quizContainer = document.getElementById('quiz-container');
@@ -425,13 +397,9 @@
         // --- Quiz State ---
         let currentQuestionIndex = 0;
         let score = 0;
-        let activeQuizData = []; // To hold the shuffled questions
+        let activeQuizData = [];
 
-        // --- Functions ---
-
-        /**
-         * Shuffles an array in place using the Fisher-Yates algorithm.
-         */
+        // --- Helpers ---
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -439,73 +407,65 @@
             }
         }
 
-        /**
-         * Initializes or restarts the quiz.
-         */
         function startQuiz() {
             currentQuestionIndex = 0;
             score = 0;
-            
-            // Create a shuffled copy of the quiz data
             activeQuizData = [...quizData];
             shuffleArray(activeQuizData);
-            
+
             resultContainer.classList.add('hidden');
             quizContainer.classList.remove('hidden');
             nextBtn.classList.add('hidden');
             showQuestion();
         }
 
-        /**
-         * Displays the current question and options.
-         */
         function showQuestion() {
             resetState();
             const question = activeQuizData[currentQuestionIndex];
-            
+
             questionText.innerHTML = question.question;
             questionHint.innerHTML = question.hint;
 
-            // Create a shuffled copy of the options
             const shuffledOptions = [...question.options];
             shuffleArray(shuffledOptions);
 
             shuffledOptions.forEach(option => {
                 const button = document.createElement('button');
-                button.dataset.originalText = option.text; // Store original text for rationale lookup
-                
-                // Create a span for the text to separate it from rationale
+                button.dataset.originalText = option.text;
+
                 const textSpan = document.createElement('span');
                 textSpan.innerHTML = option.text;
                 button.appendChild(textSpan);
-                
-                button.classList.add('option-btn', 'w-full', 'p-4', 'border-2', 'border-gray-300', 'rounded-lg', 'text-left', 'hover:bg-gray-100', 'hover:border-blue-400', 'transition-colors', 'duration-200');
-                
-                // Create rationale div
+
+                button.classList.add(
+                    'option-btn',
+                    'w-full',
+                    'p-4',
+                    'border-2',
+                    'border-gray-300',
+                    'rounded-lg',
+                    'text-left',
+                    'hover:bg-gray-100',
+                    'hover:border-blue-400',
+                    'transition-colors',
+                    'duration-200'
+                );
+
                 const rationaleDiv = document.createElement('div');
                 rationaleDiv.textContent = option.rationale;
                 rationaleDiv.classList.add('rationale');
-                if (option.isCorrect) {
-                    rationaleDiv.classList.add('rationale-correct');
-                } else {
-                    rationaleDiv.classList.add('rationale-incorrect');
-                }
+                rationaleDiv.classList.add(option.isCorrect ? 'rationale-correct' : 'rationale-incorrect');
                 button.appendChild(rationaleDiv);
 
                 button.addEventListener('click', () => selectAnswer(button, option.isCorrect));
                 optionsContainer.appendChild(button);
             });
 
-            // Typeset the math content
             if (window.MathJax) {
-                MathJax.typesetPromise([quizContainer])
-                    .catch((err) => console.log('MathJax typesetting error: ', err));
+                MathJax.typesetPromise([quizContainer]).catch(err => console.log('MathJax typesetting error:', err));
             }
         }
 
-        /**
-         * Resets the options container for the next question.
-         */
         function resetState() {
             nextBtn.classList.add('hidden');
             while (optionsContainer.firstChild) {
@@ -513,9 +473,6 @@
             }
         }
 
-        /**
-         * Handles the user's answer selection.
-         */
         function selectAnswer(selectedButton, isCorrect) {
             if (isCorrect) {
                 score++;
@@ -524,40 +481,30 @@
                 selectedButton.classList.add('selected-incorrect');
             }
 
-            // Disable all buttons and show rationale
             Array.from(optionsContainer.children).forEach(button => {
                 button.disabled = true;
                 const rationale = button.querySelector('.rationale');
                 rationale.style.display = 'block';
 
-                // Also show the correct answer if a wrong one was selected
-                const optionText = button.dataset.originalText; // Get text from data-attribute
+                const optionText = button.dataset.originalText;
                 const option = activeQuizData[currentQuestionIndex].options.find(opt => opt.text === optionText);
-                if (option && !isCorrect && option.isCorrect) {
+                if (!isCorrect && option && option.isCorrect) {
                     button.classList.add('selected-correct');
                 }
             });
 
-            // Show the next button
             nextBtn.classList.remove('hidden');
         }
 
-        /**
-         * Shows the final results.
-         */
         function showResults() {
             quizContainer.classList.add('hidden');
             resultContainer.classList.remove('hidden');
             scoreText.textContent = `Your score: ${score} / ${activeQuizData.length}`;
             if (window.MathJax) {
-                MathJax.typesetPromise([resultContainer])
-                    .catch((err) => console.log('MathJax typesetting error: ', err));
+                MathJax.typesetPromise([resultContainer]).catch(err => console.log('MathJax typesetting error:', err));
             }
         }
 
-        /**
-         * Event handler for the next button.
-         */
         function handleNextButton() {
             currentQuestionIndex++;
             if (currentQuestionIndex < activeQuizData.length) {
@@ -567,17 +514,10 @@
             }
         }
 
-        // --- Event Listeners ---
+        // --- Listeners ---
         nextBtn.addEventListener('click', handleNextButton);
         restartBtn.addEventListener('click', startQuiz);
-
-        // --- Start the Quiz on Page Load ---
         document.addEventListener('DOMContentLoaded', startQuiz);
-
     </script>
 </body>
 </html>
-
-
-
-
