@@ -384,140 +384,160 @@
             }
         ];
 
-        // --- DOM Elements ---
-        const quizContainer = document.getElementById('quiz-container');
-        const resultContainer = document.getElementById('result-container');
-        const questionText = document.getElementById('question-text');
-        const questionHint = document.getElementById('question-hint');
-        const optionsContainer = document.getElementById('options-container');
-        const nextBtn = document.getElementById('next-btn');
-        const scoreText = document.getElementById('score-text');
-        const restartBtn = document.getElementById('restart-btn');
 
-        // --- Quiz State ---
-        let currentQuestionIndex = 0;
-        let score = 0;
-        let activeQuizData = [];
-
-        // --- Helpers ---
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
+    // --- De-duplicate questions by their question text (trimmed) ---
+    function dedupeQuestions(data) {
+        const seen = new Set();
+        const unique = [];
+        for (const q of data) {
+            const key = q.question.replace(/\s+/g, ' ').trim();
+            if (!seen.has(key)) {
+                seen.add(key);
+                unique.push(q);
             }
         }
+        return unique;
+    }
 
-        function startQuiz() {
-            currentQuestionIndex = 0;
-            score = 0;
-            activeQuizData = [...quizData];
-            shuffleArray(activeQuizData);
+    // --- DOM Elements ---
+    const quizContainer = document.getElementById('quiz-container');
+    const resultContainer = document.getElementById('result-container');
+    const questionText = document.getElementById('question-text');
+    const questionHint = document.getElementById('question-hint');
+    const optionsContainer = document.getElementById('options-container');
+    const nextBtn = document.getElementById('next-btn');
+    const scoreText = document.getElementById('score-text');
+    const restartBtn = document.getElementById('restart-btn');
 
-            resultContainer.classList.add('hidden');
-            quizContainer.classList.remove('hidden');
-            nextBtn.classList.add('hidden');
+    // --- Quiz State ---
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let activeQuizData = [];
+
+    // --- Helpers ---
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    function startQuiz() {
+        currentQuestionIndex = 0;
+        score = 0;
+
+        // 1) De-duplicate by question text
+        const unique = dedupeQuestions(quizData);
+
+        // 2) Shuffle a fresh copy
+        activeQuizData = [...unique];
+        shuffleArray(activeQuizData);
+
+        resultContainer.classList.add('hidden');
+        quizContainer.classList.remove('hidden');
+        nextBtn.classList.add('hidden');
+        showQuestion();
+    }
+
+    function showQuestion() {
+        resetState();
+        const question = activeQuizData[currentQuestionIndex];
+
+        questionText.innerHTML = question.question;
+        questionHint.innerHTML = question.hint;
+
+        const shuffledOptions = [...question.options];
+        shuffleArray(shuffledOptions);
+
+        shuffledOptions.forEach(option => {
+            const button = document.createElement('button');
+            button.dataset.originalText = option.text;
+            button.dataset.correct = option.isCorrect ? "true" : "false"; // robustness
+
+            const textSpan = document.createElement('span');
+            textSpan.innerHTML = option.text;
+            button.appendChild(textSpan);
+
+            button.classList.add(
+                'option-btn',
+                'w-full',
+                'p-4',
+                'border-2',
+                'border-gray-300',
+                'rounded-lg',
+                'text-left',
+                'hover:bg-gray-100',
+                'hover:border-blue-400',
+                'transition-colors',
+                'duration-200'
+            );
+
+            const rationaleDiv = document.createElement('div');
+            rationaleDiv.textContent = option.rationale;
+            rationaleDiv.classList.add('rationale');
+            rationaleDiv.classList.add(option.isCorrect ? 'rationale-correct' : 'rationale-incorrect');
+            button.appendChild(rationaleDiv);
+
+            button.addEventListener('click', () => selectAnswer(button, option.isCorrect));
+            optionsContainer.appendChild(button);
+        });
+
+        if (window.MathJax) {
+            MathJax.typesetPromise([quizContainer]).catch(err => console.log('MathJax typesetting error:', err));
+        }
+    }
+
+    function resetState() {
+        nextBtn.classList.add('hidden');
+        while (optionsContainer.firstChild) {
+            optionsContainer.removeChild(optionsContainer.firstChild);
+        }
+    }
+
+    function selectAnswer(selectedButton, isCorrect) {
+        if (isCorrect) {
+            score++;
+            selectedButton.classList.add('selected-correct');
+        } else {
+            selectedButton.classList.add('selected-incorrect');
+        }
+
+        Array.from(optionsContainer.children).forEach(button => {
+            button.disabled = true;
+            const rationale = button.querySelector('.rationale');
+            rationale.style.display = 'block';
+
+            // Highlight the correct option if user chose wrong
+            if (!isCorrect && button.dataset.correct === "true") {
+                button.classList.add('selected-correct');
+            }
+        });
+
+        nextBtn.classList.remove('hidden');
+    }
+
+    function showResults() {
+        quizContainer.classList.add('hidden');
+        resultContainer.classList.remove('hidden');
+        scoreText.textContent = `Your score: ${score} / ${activeQuizData.length}`;
+        if (window.MathJax) {
+            MathJax.typesetPromise([resultContainer]).catch(err => console.log('MathJax typesetting error:', err));
+        }
+    }
+
+    function handleNextButton() {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < activeQuizData.length) {
             showQuestion();
+        } else {
+            showResults();
         }
+    }
 
-        function showQuestion() {
-            resetState();
-            const question = activeQuizData[currentQuestionIndex];
+    nextBtn.addEventListener('click', handleNextButton);
+    restartBtn.addEventListener('click', startQuiz);
+    document.addEventListener('DOMContentLoaded', startQuiz);
+</script>
 
-            questionText.innerHTML = question.question;
-            questionHint.innerHTML = question.hint;
-
-            const shuffledOptions = [...question.options];
-            shuffleArray(shuffledOptions);
-
-            shuffledOptions.forEach(option => {
-                const button = document.createElement('button');
-                button.dataset.originalText = option.text;
-
-                const textSpan = document.createElement('span');
-                textSpan.innerHTML = option.text;
-                button.appendChild(textSpan);
-
-                button.classList.add(
-                    'option-btn',
-                    'w-full',
-                    'p-4',
-                    'border-2',
-                    'border-gray-300',
-                    'rounded-lg',
-                    'text-left',
-                    'hover:bg-gray-100',
-                    'hover:border-blue-400',
-                    'transition-colors',
-                    'duration-200'
-                );
-
-                const rationaleDiv = document.createElement('div');
-                rationaleDiv.textContent = option.rationale;
-                rationaleDiv.classList.add('rationale');
-                rationaleDiv.classList.add(option.isCorrect ? 'rationale-correct' : 'rationale-incorrect');
-                button.appendChild(rationaleDiv);
-
-                button.addEventListener('click', () => selectAnswer(button, option.isCorrect));
-                optionsContainer.appendChild(button);
-            });
-
-            if (window.MathJax) {
-                MathJax.typesetPromise([quizContainer]).catch(err => console.log('MathJax typesetting error:', err));
-            }
-        }
-
-        function resetState() {
-            nextBtn.classList.add('hidden');
-            while (optionsContainer.firstChild) {
-                optionsContainer.removeChild(optionsContainer.firstChild);
-            }
-        }
-
-        function selectAnswer(selectedButton, isCorrect) {
-            if (isCorrect) {
-                score++;
-                selectedButton.classList.add('selected-correct');
-            } else {
-                selectedButton.classList.add('selected-incorrect');
-            }
-
-            Array.from(optionsContainer.children).forEach(button => {
-                button.disabled = true;
-                const rationale = button.querySelector('.rationale');
-                rationale.style.display = 'block';
-
-                const optionText = button.dataset.originalText;
-                const option = activeQuizData[currentQuestionIndex].options.find(opt => opt.text === optionText);
-                if (!isCorrect && option && option.isCorrect) {
-                    button.classList.add('selected-correct');
-                }
-            });
-
-            nextBtn.classList.remove('hidden');
-        }
-
-        function showResults() {
-            quizContainer.classList.add('hidden');
-            resultContainer.classList.remove('hidden');
-            scoreText.textContent = `Your score: ${score} / ${activeQuizData.length}`;
-            if (window.MathJax) {
-                MathJax.typesetPromise([resultContainer]).catch(err => console.log('MathJax typesetting error:', err));
-            }
-        }
-
-        function handleNextButton() {
-            currentQuestionIndex++;
-            if (currentQuestionIndex < activeQuizData.length) {
-                showQuestion();
-            } else {
-                showResults();
-            }
-        }
-
-        // --- Listeners ---
-        nextBtn.addEventListener('click', handleNextButton);
-        restartBtn.addEventListener('click', startQuiz);
-        document.addEventListener('DOMContentLoaded', startQuiz);
-    </script>
 </body>
 </html>
