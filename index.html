@@ -69,6 +69,7 @@
         <button id="clearBtn">Clear</button>
         <button id="joinBtn">Join Points</button>
         <button id="checkBtn">Check Answer</button>
+        <button id="solutionBtn">Show Solution</button>
     </div>
 
     <p id="resultText"></p>
@@ -96,11 +97,12 @@ const questions = [
 ];
 
 let currentFunc = null;
+let currentQuestion = null;
 
 
 
 /*******************************************
- * CANVAS + GRID SETUP
+ * CANVAS SETUP
  *******************************************/
 const canvas = document.getElementById("graphCanvas");
 const ctx = canvas.getContext("2d");
@@ -157,9 +159,10 @@ function snap(v) {
 }
 
 function pxToMath(pxX, pxY) {
-    let x = (pxX - canvas.width/2) / gridSize;
-    let y = -(pxY - canvas.height/2) / gridSize;
-    return [x, y];
+    return [
+        (pxX - canvas.width/2) / gridSize,
+        -(pxY - canvas.height/2) / gridSize
+    ];
 }
 
 function mathToPx(x, y) {
@@ -172,17 +175,15 @@ function mathToPx(x, y) {
 
 
 /*******************************************
- * POINT ADDING BY CLICKING
+ * ADD POINT BY CLICK
  *******************************************/
 canvas.addEventListener("click", e => {
     let x = snap(e.offsetX);
     let y = snap(e.offsetY);
-
-    // store math point
     let mathPt = pxToMath(x, y);
+
     userPoints.push(mathPt);
 
-    // draw point
     ctx.fillStyle = "red";
     ctx.beginPath();
     ctx.arc(x, y, 4, 0, Math.PI*2);
@@ -192,44 +193,10 @@ canvas.addEventListener("click", e => {
 
 
 /*******************************************
- * JOIN POINTS (Smooth Curve)
- * Catmull-Rom Spline
+ * CATMULL–ROM SPLINE FOR SMOOTH CURVE
  *******************************************/
-function drawSmoothCurve() {
-    if (userPoints.length < 3) return;
-
-    drawGrid(); // redraw grid
-    drawUserPoints();
-
-    // Sort points by x
-    userPoints.sort((a,b) => a[0] - b[0]);
-
-    ctx.strokeStyle = "#000";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-
-    for (let i = 0; i < userPoints.length - 1; i++) {
-        let p0 = userPoints[i-1] || userPoints[i];
-        let p1 = userPoints[i];
-        let p2 = userPoints[i+1];
-        let p3 = userPoints[i+2] || p2;
-
-        for (let t = 0; t < 1; t += 0.05) {
-            let x = catmullRom(p0[0], p1[0], p2[0], p3[0], t);
-            let y = catmullRom(p0[1], p1[1], p2[1], p3[1], t);
-
-            let [px, py] = mathToPx(x, y);
-
-            if (t === 0 && i === 0) ctx.moveTo(px, py);
-            else ctx.lineTo(px, py);
-        }
-    }
-
-    ctx.stroke();
-}
-
 function catmullRom(p0, p1, p2, p3, t) {
-    return 0.5 * ( 
+    return 0.5 * (
         (2*p1) +
         (-p0 + p2) * t +
         (2*p0 - 5*p1 + 4*p2 - p3) * t*t +
@@ -237,6 +204,11 @@ function catmullRom(p0, p1, p2, p3, t) {
     );
 }
 
+
+
+/*******************************************
+ * DRAW USER POINTS
+ *******************************************/
 function drawUserPoints() {
     for (let [x,y] of userPoints) {
         let [px,py] = mathToPx(x,y);
@@ -250,14 +222,109 @@ function drawUserPoints() {
 
 
 /*******************************************
+ * JOIN POINTS (Smooth OR Sharp for |x|)
+ *******************************************/
+function containsAbs() {
+    return currentQuestion.includes("|x|");
+}
+
+function joinPoints() {
+    if (userPoints.length < 2) return;
+
+    drawGrid();
+    drawUserPoints();
+
+    // SORT BY X FOR SMOOTH CURVE
+    userPoints.sort((a,b) => a[0] - b[0]);
+
+    ctx.strokeStyle = "#000";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+
+    // If absolute value question → piecewise linear graph (sharp vertex)
+    if (containsAbs()) {
+        let first = true;
+        for (let [x,y] of userPoints) {
+            let [px,py] = mathToPx(x,y);
+            if (first) {
+                ctx.moveTo(px,py);
+                first = false;
+            } else {
+                ctx.lineTo(px,py);
+            }
+        }
+        ctx.stroke();
+        return;
+    }
+
+    // Otherwise → smooth Catmull-Rom
+    for (let i = 0; i < userPoints.length - 1; i++) {
+        let p0 = userPoints[i-1] || userPoints[i];
+        let p1 = userPoints[i];
+        let p2 = userPoints[i+1];
+        let p3 = userPoints[i+2] || p2;
+
+        for (let t = 0; t <= 1; t += 0.05) {
+            let x = catmullRom(p0[0], p1[0], p2[0], p3[0], t);
+            let y = catmullRom(p0[1], p1[1], p2[1], p3[1], t);
+
+            let [px, py] = mathToPx(x, y);
+
+            if (i === 0 && t === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+        }
+    }
+    ctx.stroke();
+}
+
+
+
+/*******************************************
+ * SHOW SOLUTION (draw expected function)
+ *******************************************/
+function showSolution() {
+    if (!currentFunc) return;
+
+    drawGrid();
+    drawUserPoints();
+
+    ctx.strokeStyle = "green";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+
+    let first = true;
+    for (let px = 0; px < canvas.width; px++) {
+        let x = (px - canvas.width/2) / gridSize;
+        let y = currentFunc(x);
+
+        if (!isFinite(y)) continue;
+
+        let [sx, sy] = mathToPx(x,y);
+
+        if (first) {
+            ctx.moveTo(sx, sy);
+            first = false;
+        } else {
+            ctx.lineTo(sx, sy);
+        }
+    }
+
+    ctx.stroke();
+}
+
+
+
+/*******************************************
  * NEW QUESTION
  *******************************************/
 function newQuestion() {
     let index = Math.floor(Math.random() * questions.length);
-    document.getElementById("questionText").textContent = questions[index].q;
+    currentQuestion = questions[index].q;
     currentFunc = questions[index].func;
 
+    document.getElementById("questionText").textContent = currentQuestion;
     document.getElementById("resultText").textContent = "";
+
     clearCanvas();
 }
 
@@ -267,17 +334,14 @@ function newQuestion() {
  * CHECK ANSWER
  *******************************************/
 function checkAnswer() {
-    if (!currentFunc) return;
-
-    if (userPoints.length < 3) {
-        document.getElementById("resultText").textContent =
-            "Add more points first!";
+    if (!currentFunc || userPoints.length < 3) {
+        document.getElementById("resultText").textContent = "Add more points!";
         return;
     }
 
     let errors = 0;
 
-    for (let [x, y] of userPoints) {
+    for (let [x,y] of userPoints) {
         let expected = currentFunc(x);
         if (!isFinite(expected)) continue;
 
@@ -289,7 +353,7 @@ function checkAnswer() {
             "✅ Good! Your curve matches the expected function.";
     } else {
         document.getElementById("resultText").textContent =
-            "❌ Not close enough. Try adjusting your points.";
+            "❌ Not close enough. Adjust your points.";
     }
 }
 
@@ -300,10 +364,11 @@ function checkAnswer() {
  *******************************************/
 document.getElementById("newQuestionBtn").onclick = newQuestion;
 document.getElementById("clearBtn").onclick = clearCanvas;
-document.getElementById("joinBtn").onclick = drawSmoothCurve;
+document.getElementById("joinBtn").onclick = joinPoints;
 document.getElementById("checkBtn").onclick = checkAnswer;
+document.getElementById("solutionBtn").onclick = showSolution;
 
-// initialize
+// Initialize
 clearCanvas();
 </script>
 
